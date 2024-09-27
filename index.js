@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const { connectToMongoDB } = require("./connect");
 const urlRoute = require("./routes/url");
 const URL = require("./models/url");
@@ -6,41 +7,43 @@ const URL = require("./models/url");
 const app = express();
 const PORT = 8001;
 
+const corsOptions = {
+  origin: "http://127.0.0.1:5500", // Allow requests from this origin
+  methods: ["GET", "POST"], // Allow only specific methods
+};
+
+app.use(cors(corsOptions)); // Enable CORS with specified options
+
 app.use(express.json());
 
+// Connect to MongoDB
 connectToMongoDB("mongodb://localhost:27017/short-url").then(() =>
   console.log("MongoDB Connected")
 );
 
+// Use the URL routes
 app.use("/url", urlRoute);
+app.use(cors()); // Enable CORS in index.js
 
+// Handle short URL redirects
 app.get("/:shortId", async (req, res) => {
   const shortId = req.params.shortId;
 
   try {
     const entry = await URL.findOneAndUpdate(
-      {
-        shortId,
-      },
-      {
-        $push: {
-          visitHistory: { timestamp: Date.now() },
-        },
-      },
-      { new: true } // Return the updated document
+      { shortId },
+      { $push: { visitHistory: { timestamp: Date.now() } } },
+      { new: true }
     );
 
-    // Check if the entry was found
     if (!entry) {
       return res.status(404).json({ error: "Short URL not found" });
     }
 
-    // Check if the redirectURL is valid
     if (!entry.redirectURL || !/^https?:\/\//.test(entry.redirectURL)) {
       return res.status(400).json({ error: "Invalid redirect URL" });
     }
 
-    // Redirect to the original URL
     return res.redirect(entry.redirectURL);
   } catch (error) {
     console.error("Error fetching the URL:", error);
@@ -48,4 +51,5 @@ app.get("/:shortId", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log("Server Started on port", PORT));
+// Start the server
+app.listen(PORT, () => console.log(`Server Started on port ${PORT}`));

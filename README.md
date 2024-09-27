@@ -37,3 +37,25 @@ Make sure you have the following installed:
 - Node.js
 - MongoDB
 
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-username/url-shortener.git
+2. Navigate to the project directory:
+   ```bash
+   cd url-shortener
+3. Install the dependencies:
+   ```bash
+   npm install
+4. Start your MongoDB server (if it's not running):
+   ```bash
+   mongod
+5. Run the application:
+   ```bash
+   node index.js
+
+### API Endpoints
+
+

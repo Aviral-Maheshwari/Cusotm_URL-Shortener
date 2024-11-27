@@ -5,7 +5,7 @@ const urlRoute = require("./routes/url");
 const URL = require("./models/url");
 
 const app = express();
-const PORT = 8001;
+const PORT = process.env.PORT || 8001;
 
 const corsOptions = {
   origin: "http://127.0.0.1:5500", // Allow requests from this origin
@@ -17,9 +17,9 @@ app.use(cors(corsOptions)); // Enable CORS with specified options
 app.use(express.json());
 
 // Connect to MongoDB
-connectToMongoDB("mongodb://localhost:27017/short-url").then(() =>
-  console.log("MongoDB Connected")
-);
+connectToMongoDB(
+  "mongodb+srv://techaviral:dohF7Qq0QPqHJr9L@techaviral0.i812k.mongodb.net/?retryWrites=true&w=majority&appName=techaviral0"
+).then(() => console.log("MongoDB Connected"));
 
 // Use the URL routes
 app.use("/url", urlRoute);
